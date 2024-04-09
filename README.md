@@ -1,7 +1,5 @@
 # Advanced Cart System ( VARS CART )
 
-![System Snapshot](images/system_snapshot.jpg)
-
 This Arduino project implements an RFID-based smart shopping cart system. It utilizes an Arduino board, an RFID reader module, a servo motor, a liquid crystal display (LCD), and other components to create a system where users can add or remove items to/from their cart by scanning RFID tags. The system calculates the total price of the items added and displays it. It also has functionality to remove items from the cart and finalize the transaction using a master RFID card.
 
 ## Table of Contents
