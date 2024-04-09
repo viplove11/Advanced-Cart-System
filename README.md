@@ -1,4 +1,4 @@
-# Advanced Cart System [VARS CART]
+# Advanced Cart System ( VARS CART )
 
 ![System Snapshot](images/system_snapshot.jpg)
 
@@ -45,7 +45,7 @@ The system operates as follows:
 5. After the transaction is complete, further scanning of RFID tags will display a "Not Applicable" message.
 
 ## Author
-This project was created by [Viplove Parsai].
+This project was created by Viplove Parsai.
 
 ## License
 This project is licensed under the [MIT License](LICENSE).
