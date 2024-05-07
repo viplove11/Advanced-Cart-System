@@ -1,31 +1,33 @@
-// including all necessary Header files
 #include <Arduino.h>
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 #include <MFRC522.h>  // Include the MFRC522 library
+#include <Servo.h>    // Include the Servo library
 
-// defining all necessary pins
+// Defining all necessary pins
 #define SS_PIN 10
 #define RST_PIN 9
 #define SWITCH_PIN 8               // Tactile switch pin
 #define BUZZER_PIN 4               // Buzzer pin
-MFRC522 mfrc522(SS_PIN, RST_PIN);  // Create MFRC522 instance
+#define SERVO_PIN 3                // Servo motor pin
 
-// creating the object of LCD Display
-LiquidCrystal_I2C lcd(0x27, 16, 2);
+MFRC522 mfrc522(SS_PIN, RST_PIN);  // Create MFRC522 instance
+LiquidCrystal_I2C lcd(0x27, 16, 2); // Creating the object of LCD Display
+Servo servoMotor;                   // Create servo object to control a servo
 
 char input[12];
 int count = 0;
 
-// defining  the indicator for displaying bill
+// Defining the indicator for displaying bill
 int indicator = 0;
 
-// defining variable =
+// Defining variables
 double total = 0.0;  // Initialize total price as 0.0
 int count_prod = 0;
 bool masterCardDetected = false;   // Flag to track master card detection
 bool transactionComplete = false;  // Flag to track if transaction is complete
 bool removeItem = false;           // Flag to track if item removal is requested
+bool motorRotated = false;         // Flag to track if motor has rotated
 
 // Define the UIDs, names, and prices for the items
 String itemUIDs[9] = { "D04A0F25", "136F41F6", "D0C70C25", "D0619525", "D0703725", "D0002625", "D0866825", "D0632525" };
@@ -59,6 +61,9 @@ void setup() {
   lcd.clear();
   lcd.setCursor(0, 0);
   lcd.print("Add Item !!");
+
+  servoMotor.attach(SERVO_PIN);  // Attach the servo motor to its pin
+  servoMotor.write(0);  // Attach the servo motor to its pin
 }
 
 // loop functions()
@@ -75,6 +80,10 @@ void loop() {
   // Check for switch press to remove item
   if (digitalRead(SWITCH_PIN) == LOW) {
     removeItem = true;
+    servoMotor.write(120);  // Rotate the servo motor
+    delay(3000);            // Wait for 3 seconds
+    servoMotor.write(0);    // Rotate the servo motor back to initial position
+    motorRotated = true;    // Set the flag to true
   }
 
   // Check for RFID card
@@ -108,7 +117,10 @@ void loop() {
           digitalWrite(BUZZER_PIN, LOW);
           digitalWrite(6, LOW);  // Green LED (assuming)
           lcd.clear();
-        } else if (count_prod > 0 && total >= itemPrices[i] && itemCounts[i] > 0) {
+          servoMotor.write(120);
+          delay(3000);
+          servoMotor.write(0);
+        } else if (motorRotated && count_prod > 0 && total >= itemPrices[i] && itemCounts[i] > 0) {
           // Remove product and update total
           count_prod--;
           total -= itemPrices[i];
@@ -123,14 +135,12 @@ void loop() {
           delay(500);
           lcd.clear();
           lcd.setCursor(0, 0);
-          lcd.print(itemNames[i] + " Count:");
-          lcd.setCursor(0, 1);
-          lcd.print(itemCounts[i]);
+          lcd.print("Add Another Item !");
           delay(1200);                    // delay for 1.2 seconds
           digitalWrite(6, LOW);           // Turn off green LED 
           digitalWrite(BUZZER_PIN, LOW);  // Turn off buzzer
-          lcd.clear();
           removeItem = false;  // Reset the flag
+          motorRotated = false; // Reset the flag
         }
       }
     }
